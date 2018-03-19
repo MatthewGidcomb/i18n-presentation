@@ -49,8 +49,13 @@
 
 						<br />
 
-						<cite><a href="https://www.w3.org/International/questions/qa-i18n">https://www.w3.org/International/questions/qa-i18n</a></cite>
+						<cite>Definitions from <a href="https://www.w3.org/International/questions/qa-i18n">https://www.w3.org/International/questions/qa-i18n</a></cite>
 					</ul>
+					<aside class="notes">
+						<p>These definitions come from the W3C Internationalization Activity, which is a great resource.</p>
+						<p>The key distinction here is that localization is the translation etc of an application into another language, and internationalization is the process of developing the application such that it can be localized</p>
+						<p>You'll often see these terms abbreviated i18n and l10n.</p>
+					</aside>
 				</section>
 				<section>
 					<h1>Localization Concerns</h1>
@@ -60,6 +65,12 @@
 						<li class="fragment">Number formatting<br /><small>1,234.56 vs 1 234,56</small></li>
 						<li class="fragment">Currency formatting<br / ><small>$10 vs 10 €</small></li>
 					</ul>
+					<aside class="notes">
+						Internationalization / Localization is a big topic that encompasses a lot of concerns.
+						<p>Translating the content of the app into other languages is obviously the first major component that comes to mind.</p>
+						<p>Dates and times are formatted differently around the world, as are numbers. Some of these differences have more to do with the region than language.</p>
+						<p>Currency is especially tricky because you can't just update the formatting; $10 != 10 € and the conversion between them (exchange rate) fluctuates.</p>
+					</aside>
 				</section>
 				<section>
 					<h1>More Localization Concerns</h1>
@@ -69,9 +80,18 @@
 						<li class="fragment">Icons or colors used to communicate information</li>
 						<li class="fragment">Legal issues with content</li>
 					</ul>
+					<aside class="notes">
+						Most frameworks will provide ways of handling those issues, but may or may not be able to help you with these.
+						<p>Different languages have different conventions around sorting; <a href="https://en.wikipedia.org/wiki/Alphabetical_order#Language-specific_conventions">examples</a></p>
+						<p>Different cultures have different conventions surrounding human names and postal addresses. Most cultures with different name conventions have a way of mapping that convention to first name / last name</p>
+						<p>Note also that different name systems may also impact sorting; the classic example is that the Icelandic phone book being sorted by "first name", since "last name" isn't a family name but rather derived from a parent's name.</p>
+						<p>If you're using icons or color to convey information, users in other cultures may misinterpret. Examples: the classic US mailbox with the rounded top and red flag isn't universal; we use red to indicate errors or danger in the US, while in China it's associated with good luck. <a href="http://www.office.xerox.com/small-business/tips/color-guide/enus.html">more examples</a></p>
+						<p>"Legal issues" are often associated with censorship, such as China's notorious system or Germany's strict rules around Nazi imagery, but there are other issues.</p>
+					</aside>
 				</section>
 				<section>
 					<h1>Strings</h1>
+					<aside class="notes">That's a lot of potential material. We're just going to focus on strings.</aside>
 				</section>
 				<section>
 					<h1>Starting Point</h1>
@@ -79,6 +99,7 @@
 						<li>Strings inline in the user interface</li>
 						<li>Strings constructed via concatenation and template strings</li>
 					</ul>
+					<aside class="notes">This is what most of us start out with when we're building an application, because it's how we're taught to handle strings when we first learn to program. Now we're going to walk through how to prepare an app for localization, and some of the problems that have to be addressed. The concepts we cover in this section should inform the examples later in the talk.</aside>
 				</section>
 				<section>
 					<h1>Examples</h1>
@@ -101,6 +122,11 @@
 						<br />
 						<code>"$L("Hello World");"</code>
 					</div>
+					<aside class="notes">
+						<p>So the first and biggest step toward supporting localization is to make your UI text dynamic. It's probably obvious that you'd wrap all the strings in a method call, and the method will return the correct translation. (How does the method know what the correct translation is? Where do the strings come from? Glossing over for now, will discuss further when looking at examples)</p>
+						<p><a href="https://www.gnu.org/software/gettext/">gettext</a> is the old venerable way of doing this on GNU / Linux, often aliased as _ for ease of typing.</p>
+						<p>$L is a convention from a JavaScript internationalization library I've used called <a href="https://sourceforge.net/projects/i18nlib/">ilib</a>. It would have been one of the examples in this talk, but the current version on npm is pretty broken.</p>
+					</aside>
 				</section>
 				<section>
 					<h1>Problems</h1>
@@ -117,7 +143,8 @@
 						<code>"Datei " + file + " enthält " + count + " Rechtschreibfehler"</code>
 					</div>
 					<aside class="notes">
-						Example from <a href="https://www.w3.org/International/articles/composite-messages/#syntax">W3C</a>
+						Think about being the translator who gets "There were ", "spelling mistakes in file " in a list of strings to translate.
+						English-to-German example from <a href="https://www.w3.org/International/articles/composite-messages/#syntax">W3C</a>
 					</aside>
 				</section>
 				<section>
@@ -133,6 +160,7 @@
 						<br />
 						<code class="fragment">"There were {count} spelling mistakes in file {file}"</code>
 					</div>
+					<aside class="notes">Most programming languages and internationalization frameworks support template strings with reorderable parameters. I like the second syntax in the examples because with well-chosen var names it's very clear what's being substituted in.</aside>
 				</section>
 				<section>
 					<h1>More Problems</h1>
@@ -147,9 +175,11 @@
 						<div>proper translation may depend on knowing gender of device</div>
 					</div>
 					<aside class="notes">
-						More examples from these links:
-							<a href="https://www.w3.org/International/articles/composite-messages/index">https://www.w3.org/International/articles/composite-messages/index</a>
-							<a href="https://www.w3.org/International/articles/text-reuse/index">https://www.w3.org/International/articles/text-reuse/index</a>
+						The next set of problems you'll encounter.
+						<p>Plural examples: English has singular and plural, Arabic has cases for 1, 2, and >2, Russian is the classic example of an extremely complicated case, with a distinction between "few" and "many" items</p>
+						<p>Gender examples: This only comes up in English with pronouns, but many other languages use different verb and adjective forms to describe objects with different genders, which describes more than just humans / animals. </p>
+						<p>And of course you may have to deal with both pluralization and gender in the same string.</p>
+						<p>More examples <a href="https://www.w3.org/International/articles/composite-messages/index">here</a> and <a href="https://www.w3.org/International/articles/text-reuse/index">here</a>.</p>
 					</aside>
 				</section>
 				<section>
@@ -160,7 +190,7 @@
 					</ul>
 					<div class="fragment">Printer: on</div>
 					<aside class="notes">
-						cite here
+						We'll look at some examples of in-string switch / case syntax later in the talk.
 					</aside>
 				</section>
 				<section>
@@ -170,15 +200,22 @@
 						<li class="fragment">Different scripts (alphabets) may require larger font sizes to be legible</li>
 						<li class="fragment">Right-to-left languages may impact design</li>
 					</ul>
+					<aside class="notes">
+						<p>German and Italian are often cited as examples of languages where the translation is often longer than the source string</p>
+						<p>The scripts used in Asian languages, with the amount of detail on many glyphs, are particularly vulnerable to issues with font size.</p>
+						<p>RTL languages won't necessarily impact your translations, as the translation can just be written in the correct order, but it may mess with your UI design.</p>
+					</aside>
 				</section>
 				<section>
 					<h1>Solutions?</h1>
 					<p>Design layout with these possibilities in mind</p>
+					<aside class="notes">These problems are harder to solve with frameworks. You really have to plan for them when you're designing your application. This is why most resources will recommend that you plan for internationalization from the beginning.</aside>
 				</section>
 				<section>
 					<h1>Aside: Pseudolocalization</h1>
 					<p>Technique for testing internationalization support without requiring real translations</p>
 					<p class="fragment">Simulate localization by modifying localized strings and date / number formatting</p>
+					<aside class="notes">Pseudolocalization is one methodology that can help you design with internationalization in mind, even if you don't have the capability to localize from the beginning.</aside>
 				</section>
 				<section>
 					<h1>Pseudolocalization</h1>
@@ -189,6 +226,7 @@
 								<li class="fragment"><code>"Hello World" => "Ħëľľõ Ŵõŕľð"</code></li>
 								<li class="fragment">Shows which strings may have been overlooked</li>
 							</ul>
+							<aside class="notes">This is an English-centric example; there are a lot of other ways to transform strings. The goal is to clearly signal that the text has been localized while still being legible to the developer.</aside>
 						</li>
 						<li class="fragment">
 							Pad or lengthen strings to simulate natural lengthening in translations
@@ -196,12 +234,14 @@
 								<li class="fragment"><code>"Hello World" => "Ħëľľõ Ŵõŕľð54321"</code></li>
 								<li class="fragment">Identifies text that may overflow containers</li>
 							</ul>
+							<aside class="notes">Again there are a lot of ways you could do this; this is the way ilib does it: padding the string with a decreasing sequence of numbers, so that if you see text in your app that doesn't end in 1, you know it has been truncated.</aside>
 						</li>
 						<li class="fragment">Simulate non-Latin scripts, RTL languages</li>
 					</ul>
 				</section>
 				<section>
 					<h1>Framework Examples</h1>
+					<aside class="notes">We're going to look at four examples, two server-side rendering examples and two client-side</aside>
 				</section>
 				<section>
 					<h1>Server-Side Rendering</h1>
@@ -210,6 +250,7 @@
 						<li class="fragment">Load locale-specific string resources and make them available to the rendering system</li>
 						<li class="fragment">Views reference string resources instead of inline strings</li>
 					</ul>
+					<aside class="notes">This is the basic pattern when rendering server-side</aside>
 				</section>
 				<section>
 					<h1>Aside: Determining Locale</h1>
@@ -226,6 +267,11 @@
 						</li>
 						<li>User selection and cookies</li>
 					</ul>
+					<aside class="notes">
+						<p>We've glossed over two important factors that we should go over now: determining the locale and supplying translated strings.</p>
+						<p>Relying on IP addresses is problematic for travellers, for example an American travelling abroad in Japan who doesn't read the language. <code>navigator.language</code> is common in client-side JS frameworks but has accuracy issues (notably the value it returns isn't specified in the spec and may differ from <code>accept-language</code>)</p>
+						<p>Most sources will recommend accept-language or locale-specific URIs; whatever technique you use you should also allow the user to set their preferred locale in case detection fails.</p>
+					</aside>
 				</section>
 				<section>
 					<h1>Aside: String Resources</h1>
@@ -243,7 +289,10 @@
 							<code>"My Application": "My Application"</code>
 						</li>
 					</ul>
-					<aside class="notes">Descriptive names are more common, but the nice thing about using the default locale content is that you can fall back to it in the default locale, without needing a separate resource file</aside>
+					<aside class="notes">
+						The other thing we haven't talked about is where your translated strings come from. The exact setup will vary from framework to framework but in all of them you'll have a collection of resource files and load the correct one for the current locale.
+						For key-naming schemes descriptive names are more common, but the nice thing about using the default locale content is that you can fall back to the key in the default locale, possibly negating the need for a default-locale resource file
+					</aside>
 				</section>
 				<section>
 					<h1>Server-Side Examples</h1>
@@ -260,6 +309,7 @@
 							<div>(YAML or Ruby files)</div>
 						</div>
 					</div>
+					<aside class="notes">We're going to look at Laravel and Rail's built-in support side-by-side to highlight how similar they are (except for some code examples that wouldn't format correctly side-by-side)</aside>
 				</section>
 				<section>
 					<h1>Server-Side Examples</h1>
@@ -271,10 +321,11 @@
   return [
     "header" => "Hello World",
     "welcome" => "Welcome, :name",
-    "lights" => "{0} There are no lights|{1} There is one light|[2,Inf] There are :count lights!" e
+    "lights" => "{0} There are no lights|{1} There is one light|[2,Inf] There are :count lights!"
   ];
 						</code></pre>
 					</div>
+					<aside class="notes">The third example here is an example of the switch / case string format we discussed earlier. There are substrings for 0, 1, or more lights; when translating to a language with different pluralization rules the translator can substitute not only different content but also use a different set of cases.</aside>
 				</section>
 				<section>
 					<h1>Server-Side Examples</h1>
@@ -361,6 +412,7 @@ t :lights, count: 4 # => "There are 4 lights!"
 						<li class="fragment">Request locale-specific string resources from server</li>
 						<li class="fragment">Make string resources available to components</li>
 					</ul>
+					<aside class="notes">With client-side rendering the pattern is slightly different, since some of the work is being pushed to the client.</aside>
 				</section>
 				<section>
 					<h1>Client-Side Examples</h1>
@@ -382,6 +434,7 @@ t :lights, count: 4 # => "There are 4 lights!"
 							</ul>
 						</div>
 					</div>
+					<aside class="notes">AngularJS and React don't have built-in support like Laravel and Rails, so we're going to look at a 3rd-party package for each. There are alternatives to both of these, although react-intl seems to be the standard for React.</aside>
 				</section>
 				<section>
 					<h1>Client-Side Examples: AngularJS</h1>
@@ -393,6 +446,7 @@ t :lights, count: 4 # => "There are 4 lights!"
     "lights": "There {count, plural, =0 {are no lights} one { is 1 light } other { are { count, number} lights!}}"
 }
 					</code></pre>
+					<aside class="notes">The plural example here uses a format from the ICU library, a well-established internationalization library. It's different from the standard angular interpolation syntax (see the second line).</aside>
 				</section>
 				<section>
 					<h1>Client-Side Examples: AngularJS</h1>
@@ -405,6 +459,7 @@ app.config(['$translateProvider', function ($translateProvider) {
     .preferredLanguage('en');
 }]);
 					</code></pre>
+					<aside class="notes">Since we're doing rendering on the client now we need access to the string resources there as well. In most cases you'll perform an AJAX request for the JSON translation table during setup, before you start rendering.</aside>
 				</section>
 				<section>
 					<h1>Client-Side Examples: AngularJS</h1>
@@ -422,6 +477,7 @@ app.config(['$translateProvider', function ($translateProvider) {
 &lt;/div&gt;
 
 					</code></pre>
+					<aside class="notes">Note the extra attribute on the plural example, telling the directive how to do interpolation, since MessageFormat doesn't use the same conventions as standard angular interpolation.</aside>
 				</section>
 				<section>
 					<h1>Client-Side Examples: React</h1>
@@ -464,6 +520,7 @@ ReactDOM.render(
     values={{ count: 4 }}
 /&gt;
 					</code></pre>
+					<aside class="notes">These components are used in place of inlining the text content. The defaultMessage attribute allows for fallback for missing resources but also supports tooling such as a babel plugin that can parse your component files and extract the strings to populate your translation table.</aside>
 				</section>
 				<section>
 					<h1>Resources</h1>
