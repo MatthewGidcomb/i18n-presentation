@@ -1,0 +1,512 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>String Internationalization in Web Applications</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white-custom.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>String Internationalization in Web Applications</h1>
+					<br />
+					<div>
+						<h2>Matthew Gidcomb</h2>
+						<p>KYJSUG / KYPHPUG Crossover Meeting</p>
+						<p>2018-03-15</p>
+					</div>
+				</section>
+				<section>
+					<h1>Outline</h1>
+					<ul>
+						<li>Quick overview of internationalization</li>
+						<li>Discuss challenges involved with handling string translation</li>
+						<li>Framework examples</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Terminology</h1>
+					<ul>
+						<li><strong>Localization</strong>: the adaptation of a product, application or document content to meet the language, cultural and other requirements of a specific target market.</li>
+						<li><strong>Internationalization</strong>: the design and development of a product, application or document content that enables easy localization for target audiences that vary in culture, region, or language.</li>
+
+						<br />
+
+						<cite><a href="https://www.w3.org/International/questions/qa-i18n">https://www.w3.org/International/questions/qa-i18n</a></cite>
+					</ul>
+				</section>
+				<section>
+					<h1>Localization Concerns</h1>
+					<ul>
+						<li class="fragment">Text translation</li>
+						<li class="fragment">Date and time formatting<br /><small>03/15/2018 vs 15.03.2018</small></li>
+						<li class="fragment">Number formatting<br /><small>1,234.56 vs 1 234,56</small></li>
+						<li class="fragment">Currency formatting<br / ><small>$10 vs 10 €</small></li>
+					</ul>
+				</section>
+				<section>
+					<h1>More Localization Concerns</h1>
+					<ul>
+						<li class="fragment">Sort Order</li>
+						<li class="fragment">Names and postal addresses</li>
+						<li class="fragment">Icons or colors used to communicate information</li>
+						<li class="fragment">Legal issues with content</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Strings</h1>
+				</section>
+				<section>
+					<h1>Starting Point</h1>
+					<ul>
+						<li>Strings inline in the user interface</li>
+						<li>Strings constructed via concatenation and template strings</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Examples</h1>
+					<div>
+						<code>"There are " + count + " lights!"</code>
+						<br />
+						<code>"There are %d lights!"</code>
+						<br />
+						<code>"There are ${count} lights!"</code>
+					</div>
+				</section>
+				<section>
+					<h1>Step 1</h1>
+					<p>Replace inline strings with function / method call</p>
+					<br />
+					<div>
+						<code>gettext("Hello World");</code>
+						<br />
+						<code>_("Hello World");</code>
+						<br />
+						<code>"$L("Hello World");"</code>
+					</div>
+				</section>
+				<section>
+					<h1>Problems</h1>
+					<ul>
+						<li class="fragment">Accurately translating substring fragments is difficult without context</li>
+						<li class="fragment">Accurately translating a concatenated / format strings may require reordering the elements</li>
+					</ul>
+					<br />
+					<br />
+					<div class="fragment">
+						<code>"There were " + count + " spelling mistakes in file " + file</code>
+						<br />
+						<br />
+						<code>"Datei " + file + " enthält " + count + " Rechtschreibfehler"</code>
+					</div>
+					<aside class="notes">
+						Example from <a href="https://www.w3.org/International/articles/composite-messages/#syntax">W3C</a>
+					</aside>
+				</section>
+				<section>
+					<h1>Solutions</h1>
+					<ul>
+						<li class="fragment">Favor template strings over concatenation</li>
+						<li class="fragment">Favor template string syntaxes which support positional or named parameters</li>
+					</ul>
+					<br />
+					<br />
+					<div>
+						<code class="fragment">"There were %1$d spelling mistakes in file %2$s"</code>
+						<br />
+						<code class="fragment">"There were {count} spelling mistakes in file {file}"</code>
+					</div>
+				</section>
+				<section>
+					<h1>More Problems</h1>
+					<ul>
+						<li class="fragment">Languages have different rules for pluralization</li>
+						<li class="fragment">Langauges have different rules for gender agreement</li>
+					</ul>
+					<br />
+					<br />
+					<div class="fragment">
+						<code>"The {device} has been disabled"</code>
+						<div>proper translation may depend on knowing gender of device</div>
+					</div>
+					<aside class="notes">
+						More examples from these links:
+							<a href="https://www.w3.org/International/articles/composite-messages/index">https://www.w3.org/International/articles/composite-messages/index</a>
+							<a href="https://www.w3.org/International/articles/text-reuse/index">https://www.w3.org/International/articles/text-reuse/index</a>
+					</aside>
+				</section>
+				<section>
+					<h1>Solutions</h1>
+					<ul>
+						<li class="fragment">Internationalization frameworks usually support switch / case syntax for choosing a string template</li>
+						<li class="fragment">W3C recommends wording messages in topic-comment format to minimize gender and pluralization issues</li>
+					</ul>
+					<div class="fragment">Printer: on</div>
+					<aside class="notes">
+						cite here
+					</aside>
+				</section>
+				<section>
+					<h1>Even More Problems</h1>
+					<ul>
+						<li class="fragment">Translations may be considerably longer than source strings</li>
+						<li class="fragment">Different scripts (alphabets) may require larger font sizes to be legible</li>
+						<li class="fragment">Right-to-left languages may impact design</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Solutions?</h1>
+					<p>Design layout with these possibilities in mind</p>
+				</section>
+				<section>
+					<h1>Aside: Pseudolocalization</h1>
+					<p>Technique for testing internationalization support without requiring real translations</p>
+					<p class="fragment">Simulate localization by modifying localized strings and date / number formatting</p>
+				</section>
+				<section>
+					<h1>Pseudolocalization</h1>
+					<ul>
+						<li class="fragment">
+							Programmatically transform strings covered by internationalization system
+							<ul>
+								<li class="fragment"><code>"Hello World" => "Ħëľľõ Ŵõŕľð"</code></li>
+								<li class="fragment">Shows which strings may have been overlooked</li>
+							</ul>
+						</li>
+						<li class="fragment">
+							Pad or lengthen strings to simulate natural lengthening in translations
+							<ul>
+								<li class="fragment"><code>"Hello World" => "Ħëľľõ Ŵõŕľð54321"</code></li>
+								<li class="fragment">Identifies text that may overflow containers</li>
+							</ul>
+						</li>
+						<li class="fragment">Simulate non-Latin scripts, RTL languages</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Framework Examples</h1>
+				</section>
+				<section>
+					<h1>Server-Side Rendering</h1>
+					<ul>
+						<li class="fragment">Determine the locale for each request</li>
+						<li class="fragment">Load locale-specific string resources and make them available to the rendering system</li>
+						<li class="fragment">Views reference string resources instead of inline strings</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Aside: Determining Locale</h1>
+					<ul>
+						<li>Accept-Language HTTP Header</li>
+						<li>Geolocation using IP address</li>
+						<li><code>navigator.language</code> property in browser</li>
+						<li>
+							Locale-specific URIs (subdomain or path)
+							<ul>
+								<li>en.example.com/</li>
+								<li>example.com/en/</li>
+							</ul>
+						</li>
+						<li>User selection and cookies</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Aside: String Resources</h1>
+					<ul>
+						<li class="fragment">Typically one file per language / locale</li>
+						<li class="fragment">Key-value pairs</li>
+						<li class="fragment">
+							Keys may be descriptive names
+							<br />
+							<code>"main.header": "My Application"</code>
+						</li>
+						<li class="fragment">
+							Or the content of the string in the default locale
+							<br />
+							<code>"My Application": "My Application"</code>
+						</li>
+					</ul>
+					<aside class="notes">Descriptive names are more common, but the nice thing about using the default locale content is that you can fall back to it in the default locale, without needing a separate resource file</aside>
+				</section>
+				<section>
+					<h1>Server-Side Examples</h1>
+					<div class="stretch">
+						<div class="col-2">
+							<h2>Laravel</h2>
+							<div>String resources</div>
+							<div>in <code>resources/lang</code></div>
+							<div>(PHP files)</div>
+						</div>
+						<div class="col-2">
+							<h2>Rails</h2>
+							<div>String resources in <code>config/locales</code></div>
+							<div>(YAML or Ruby files)</div>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h1>Server-Side Examples</h1>
+					<h2>Laravel</h2>
+					<div>
+						<pre><code class="php">
+<?php
+
+  return [
+    "header" => "Hello World",
+    "welcome" => "Welcome, :name",
+    "lights" => "{0} There are no lights|{1} There is one light|[2,Inf] There are :count lights!" e
+  ];
+						</code></pre>
+					</div>
+				</section>
+				<section>
+					<h1>Server-Side Examples</h1>
+					<h2>Rails</h2>
+					<div>
+						<pre><code class="yaml">
+en:
+  header: "Hello World"
+  welcome: "Welcome, %{name}",
+  lights:
+    zero: "There are no lights"
+    one: "There is one light"
+    other: "There are %{count} lights!"
+						</code></pre>
+					</div>
+				</section>
+				<section>
+					<h1>Server-Side Examples</h1>
+					<div class="stretch">
+						<div class="col-2">
+							<h2>Laravel</h2>
+							<div>
+								Set default locale in <code>config/app.php</code>
+								<pre><code class="php">'locale' => 'en'</code></pre>
+							</div>
+							<div>
+								Set locale for request in controller
+								<pre><code class="php">App::setLocale($locale);</code></pre>
+							</div>
+						</div>
+						<div class="col-2">
+							<h2>Rails</h2>
+							<div>
+								Set default locale in <code>config/application.rb</code>
+								<pre><code class="ruby">config.i18n.default_locale = :en</code></pre>
+							</div>
+							<div>
+								Set locale for request in controller
+								<pre><code class="ruby">I18n.locale = params[:locale]</code></pre>
+							</div>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h1>Server-Side Examples</h1>
+					<div class="stretch">
+						<div class="col-2">
+							<h2>Laravel</h2>
+							<div>
+								Access resources in views with <code>trans</code> and <code>trans_choice</code> helpers
+							</div>
+						</div>
+						<div class="col-2">
+							<h2>Rails</h2>
+							<div>
+								Access resources in views with <code>translate</code> or <code>t</code> helper
+							</div>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h1>Server-Side Examples</h1>
+					<div>
+						<h2>Laravel</h2>
+						<pre><code class="php">
+trans('header'); // => "Hello World"
+trans('welcome', ['name' => 'Ron']); // => "Welcome, Ron"
+trans_choice('lights', 4); // => "There are 4 lights!"
+						</code></pre>
+					</div>
+					<div>
+						<h2>Rails</h2>
+						<pre><code class="ruby">
+t :header # => "Hello World"
+t :welcome, name: "Ron" # => "Welcome, Ron"
+t :lights, count: 4 # => "There are 4 lights!"
+						</code></pre>
+					</div>
+				</section>
+				<section>
+					<h1>Client-Side Rendering</h1>
+					<ul>
+						<li class="fragment">Determine browser locale at page load</li>
+						<li class="fragment">Request locale-specific string resources from server</li>
+						<li class="fragment">Make string resources available to components</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Client-Side Examples</h1>
+					<div class="stretch">
+						<div class="col-2">
+							<h2>AngularJS</h2>
+							<p><code>angular-translate</code></p>
+							<ul>
+								<li>Services for configuring localization resources and translation in controllers</li>
+								<li>Directive and filter for translation in views</li>
+							</ul>
+						</div>
+						<div class="col-2">
+							<h2>React</h2>
+							<p><code>react-intl</code></p>
+							<ul>
+								<li>Component to inject localization resources into children's props</li>
+								<li>Components to wrap translatable text</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h1>Client-Side Examples: AngularJS</h1>
+					<div>JSON translation table</div>
+					<pre><code class="json">
+{
+    "header": "Hello World",
+    "welcome": "Welcome, {{name}}",
+    "lights": "There {count, plural, =0 {are no lights} one { is 1 light } other { are { count, number} lights!}}"
+}
+					</code></pre>
+				</section>
+				<section>
+					<h1>Client-Side Examples: AngularJS</h1>
+					<h2>Configure translation resources</h2>
+					<pre><code class="javascript">
+app.config(['$translateProvider', function ($translateProvider) {
+    $translateProvider
+    .translations('en', translations)
+    .useStaticFilesLoader({ prefix: "locale-", suffix: ".json" })
+    .preferredLanguage('en');
+}]);
+					</code></pre>
+				</section>
+				<section>
+					<h1>Client-Side Examples: AngularJS</h1>
+					<h2>Using directive</h2>
+					<pre><code class="html">
+&lt;div translate="header"&gt;&lt;/div&gt;
+&lt;div
+    translate="welcome"
+    translate-values="{ name: "Ron" }"
+&gt;&lt;/div&gt;
+&lt;div
+    translate="lights"
+    translate-values="{ count: 4 }"
+    translate-interpolation="messageformat"&gt;
+&lt;/div&gt;
+
+					</code></pre>
+				</section>
+				<section>
+					<h1>Client-Side Examples: React</h1>
+					<h2>JSON translation table</h2>
+					<pre><code class="json">
+{
+    "header": "Hello World",
+    "welcome": "Welcome, {name}",
+    "lights": "There {count, plural, =0 {are no lights} one { is 1 light } other { are { count, number} lights!}}"
+}
+					</code></pre>
+				</section>
+				<section>
+					<h1>Client-Side Examples: React</h1>
+					<h2></h2>
+					<pre><code class="jsx">
+ReactDOM.render(
+    &lt;IntlProvider locale={locale} messages={localeData}&gt;
+        &lt;App /&gt;
+    &lt;/IntlProvider&gt;,
+    document.getElementById('react-view')
+);
+					</code></pre>
+				</section>
+				<section>
+					<h1>Client-Side Examples: React</h1>
+					<pre><code class="jsx">
+&lt;FormattedMessage
+    id="header"
+    defaultMessage="Hello World!"
+/&gt;
+&lt;FormattedMessage
+    id="welcome"
+    defaultMessage="Welcome, {name}"
+    values={{ name: "Ron" }}
+/&gt;
+&lt;FormattedMessage
+    id="lights"
+    defaultMessage="There {count, plural, =0 {are no lights} one {is 1 light} other {are {count, number} lights!}}"
+    values={{ count: 4 }}
+/&gt;
+					</code></pre>
+				</section>
+				<section>
+					<h1>Resources</h1>
+					<h2>W3C Internationalization Activity</h2>
+					<a href="https://www.w3.org/International/">https://www.w3.org/International/</a>
+					<p>Topic overviews, recommendations and best practices</p>
+				</section>
+				<section>
+					<h1>Resources</h1>
+					<h2>ICU library</h2>
+					<a href="http://userguide.icu-project.org/">http://userguide.icu-project.org/</a>
+					<p>C/C++ and Java library; conventions and message formats adopted by many other libraries</p>
+				</section>
+				<section>
+					<h1>Resources</h1>
+					<h2>IANA / IETF Language Subtag Registry</h2>
+					<a href="http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry">http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry</a>
+					<p>Official source of language subtags used to define a locale</p>
+				</section>
+				<section>
+					<h1>Resources</h1>
+					<h2>Common Locale Data Repository (CLDR)</h2>
+					<a href="http://cldr.unicode.org/">http://cldr.unicode.org/</a>
+					<p>Source of data used by many internationalization libraries</p>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
