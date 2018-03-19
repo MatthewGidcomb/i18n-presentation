@@ -16,9 +16,9 @@ npm start
 If you're interested in further reading, these resources (cited at the end of the presentation) may be of interest:
  - ## [W3C Internationalization Activity](https://www.w3.org/International/)
    Topic overviews, recommendations and best practices, from high-level authoring considerations down to character-encoding issues
- - ## [ICU library](http://userguide.icu-project.org/">http://userguide.icu-project.org/)
+ - ## [ICU library](http://userguide.icu-project.org/)
     Well-established C/C++ and Java library whose conventions and message formats have been adopted by many other frameworks
  - ## [IANA / IETF Language Subtag Registry](http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
     The official source of language subtags used to define a locale
- - ## [Common Locale Data Repository (CLDR)](http://cldr.unicode.org/">http://cldr.unicode.org/)
+ - ## [Common Locale Data Repository (CLDR)](http://cldr.unicode.org/)
     Source of data used by many internationalization libraries to support locale-aware formatting (date / time, number, pluralization rules, etc.)
